@@ -6,14 +6,46 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import RNPrint from 'react-native-print';
+
 class App extends React.Component {
+  state = {
+    selectedPrinter: null,
+  };
+
+  forIosOnly = () => (
+    <View style={styles.ios}>
+      <TouchableOpacity style={styles.btn}>
+        <Text style={styles.btnText}>Choose Printer</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.btn}>
+        <Text style={styles.btnText}>Silent Printing</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // @NOTE iOS Only
+  selectPrinter = async () => {
+    const selectedPrinter = await RNPrint.selectPrinter({x: 100, y: 100});
+    this.setState({selectedPrinter});
+  };
+
+  // @NOTE iOS Only
+  silentPrint = async () => {
+    if (!this.state.selectedPrinter) {
+      alert('Must Select Printer First');
+    }
+  };
   render() {
     return (
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Print Documents</Text>
         <View style={styles.content}>
+          {(Platform.OS = 'ios' && this.forIosOnly())}
           <TouchableOpacity style={styles.btn}>
             <Text style={styles.btnText}>Print HTML</Text>
           </TouchableOpacity>
@@ -22,12 +54,6 @@ class App extends React.Component {
           </TouchableOpacity>
           <TouchableOpacity style={styles.btn}>
             <Text style={styles.btnText}>Print Remote PDF</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
-            <Text style={styles.btnText}>Choose Printer</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
-            <Text style={styles.btnText}>Silent Printing</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -69,6 +95,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 12,
     color: '#fff',
+  },
+  ios: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    width: '100%',
   },
 });
 
